@@ -14,6 +14,9 @@ from typing import Tuple
 logger = logging.getLogger("fraud_engine.server")
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+FRONTEND_DIST_DIR = os.path.join(BASE_DIR, "frontend", "dist")
+
 
 def is_port_available(port: int, host: str = "127.0.0.1") -> bool:
     """
@@ -71,15 +74,15 @@ def run_server(
         if was_busy:
             print(f"[INFO] Switched from busy port {port} -> {selected_port}")
 
-    print("\n" + "=" * 70)
-    print(f"  🚀 FRAUD DETECTION INFERENCE API SERVER")
-    print(f"  • Host:                 {host} (Localhost)")
-    print(f"  • Port:                 {selected_port}")
-    print(f"  • Base URL:             http://{host}:{selected_port}")
-    print(f"  • Swagger Docs (UI):    http://{host}:{selected_port}/docs")
-    print(f"  • Redoc Docs:           http://{host}:{selected_port}/redoc")
-    print(f"  • Health Check:         http://{host}:{selected_port}/health")
-    print("=" * 70 + "\n")
+    frontend_mounted = os.path.exists(FRONTEND_DIST_DIR)
+
+    print("\n" + "=" * 75)
+    print("  🚀 AEGISRISK FRAUD DETECTION & ANOMALY SCORING ENGINE")
+    print(f"  • Web Dashboard (UI):   http://{host}:{selected_port}")
+    print(f"  • Swagger Docs (API):   http://{host}:{selected_port}/docs")
+    print(f"  • Health Endpoint:      http://{host}:{selected_port}/health")
+    print(f"  • Frontend Mounted:     {'YES (Ready at /)' if frontend_mounted else 'NO (Run cd frontend && npm run build)'}")
+    print("=" * 75 + "\n")
 
     uvicorn.run(
         "src.api.app:app",
