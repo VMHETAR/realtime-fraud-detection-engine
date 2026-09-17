@@ -8,7 +8,7 @@ import { ApiPlayground } from './components/ApiPlayground';
 import { EndpointModal } from './components/EndpointModal';
 import { ApiConfig } from './types';
 import { checkBackendHealth, DEFAULT_API_URL } from './utils/api';
-import { Shield, Github, Sparkles, Terminal, Activity, Cpu, ArrowUpRight } from 'lucide-react';
+import { Shield, Github, Sparkles, Terminal, Activity, Cpu, ArrowUpRight, Zap, Target, CheckCircle, Scale } from 'lucide-react';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<string>('simulator');
@@ -48,16 +48,16 @@ export const App: React.FC = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#030712] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-black relative overflow-x-hidden">
-      {/* Background Decorative Ambient Gradients (Glassmorphism Depth) */}
+    <div className="min-h-screen bg-[#06080e] text-slate-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-black relative overflow-x-hidden">
+      {/* Background Ambient Glows */}
       <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-10%] left-[20%] w-[600px] h-[600px] rounded-full bg-emerald-500/10 blur-[140px] animate-pulse-slow" />
-        <div className="absolute top-[30%] right-[-5%] w-[550px] h-[550px] rounded-full bg-cyan-500/10 blur-[150px]" />
-        <div className="absolute bottom-[-10%] left-[10%] w-[700px] h-[500px] rounded-full bg-indigo-500/10 blur-[160px]" />
-        <div className="absolute inset-0 bg-grid-pattern opacity-60" />
+        <div className="absolute top-[-15%] left-[15%] w-[650px] h-[650px] rounded-full bg-emerald-500/[0.07] blur-[150px]" />
+        <div className="absolute top-[25%] right-[-10%] w-[600px] h-[600px] rounded-full bg-cyan-500/[0.06] blur-[160px]" />
+        <div className="absolute bottom-[-10%] left-[5%] w-[700px] h-[550px] rounded-full bg-indigo-500/[0.06] blur-[170px]" />
+        <div className="absolute inset-0 bg-grid-pattern opacity-75" />
       </div>
 
-      {/* Glass Header */}
+      {/* Clean Glass Header */}
       <Header
         activeTab={activeTab}
         setActiveTab={setActiveTab}
@@ -66,7 +66,63 @@ export const App: React.FC = () => {
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-7 relative z-10 space-y-6">
+        {/* KPI Strip */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+          <div className="glass-card p-3.5 rounded-2xl flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center flex-shrink-0">
+              <Target className="w-4.5 h-4.5 text-emerald-400" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 font-medium block">PR-AUC (AUPRC)</span>
+              <div className="flex items-baseline space-x-1.5 mt-0.5">
+                <span className="text-lg font-bold font-mono text-white">0.8384</span>
+                <span className="text-[10px] font-mono text-emerald-400 font-semibold">+4.9% vs Baseline</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card p-3.5 rounded-2xl flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center flex-shrink-0">
+              <Zap className="w-4.5 h-4.5 text-cyan-400" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 font-medium block">P50 Tree Latency</span>
+              <div className="flex items-baseline space-x-1.5 mt-0.5">
+                <span className="text-lg font-bold font-mono text-white">0.375 ms</span>
+                <span className="text-[10px] font-mono text-slate-400">139k tx/sec</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card p-3.5 rounded-2xl flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center flex-shrink-0">
+              <CheckCircle className="w-4.5 h-4.5 text-indigo-400" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 font-medium block">Precision on 42k Test</span>
+              <div className="flex items-baseline space-x-1.5 mt-0.5">
+                <span className="text-lg font-bold font-mono text-white">96.77%</span>
+                <span className="text-[10px] font-mono text-slate-400">Only 2 FP</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card p-3.5 rounded-2xl flex items-center space-x-3.5">
+            <div className="w-9 h-9 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center flex-shrink-0">
+              <Scale className="w-4.5 h-4.5 text-purple-400" />
+            </div>
+            <div>
+              <span className="text-[11px] text-slate-400 font-medium block">Calibration Error (ECE)</span>
+              <div className="flex items-baseline space-x-1.5 mt-0.5">
+                <span className="text-lg font-bold font-mono text-white">0.0001</span>
+                <span className="text-[10px] font-mono text-purple-400">Platt Scaled</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Dynamic Tab Views */}
         {activeTab === 'simulator' && <LiveSimulator apiConfig={apiConfig} />}
         {activeTab === 'batch' && <BatchInspector apiConfig={apiConfig} />}
         {activeTab === 'benchmarks' && <BenchmarksView />}
@@ -75,15 +131,15 @@ export const App: React.FC = () => {
       </main>
 
       {/* Glass Minimal Footer */}
-      <footer className="border-t border-white/[0.06] bg-[#030712]/70 backdrop-blur-xl mt-16 py-8 relative z-10">
+      <footer className="border-t border-white/[0.06] bg-[#06080e]/80 backdrop-blur-xl mt-16 py-8 relative z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center space-x-3 text-xs text-slate-400">
             <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
               <Shield className="w-3.5 h-3.5 text-emerald-400" />
             </div>
-            <span className="text-slate-200 font-medium tracking-tight">AegisRisk Intelligence</span>
+            <span className="text-slate-200 font-medium tracking-tight">AegisRisk AI</span>
             <span className="text-slate-600">•</span>
-            <span className="text-slate-400">Calibrated Soft-Voting Stacking &amp; Real-Time Imbalanced Risk Scoring</span>
+            <span className="text-slate-400">Real-Time Financial Anomaly &amp; Imbalance Risk Scoring</span>
           </div>
 
           <div className="flex items-center space-x-5 text-xs">
