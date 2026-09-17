@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, Play, CheckCircle, AlertTriangle, Search, Filter, Download, FileText, Database, ShieldCheck, ShieldAlert } from 'lucide-react';
+import { Upload, Play, CheckCircle, AlertTriangle, Search, Filter, Download, FileText, Database, ShieldCheck, ShieldAlert, X } from 'lucide-react';
 import { Transaction, FraudPredictionResponse, ApiConfig } from '../types';
 import { SAMPLE_BATCH_DATA } from '../utils/sampleBatch';
 import { scoreBatch } from '../utils/api';
@@ -131,22 +131,22 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
   return (
     <div className="space-y-6">
       {/* Top Action Bar */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-5 shadow-lg flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div className="glass-panel rounded-2xl p-6 shadow-2xl flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <div className="flex items-center space-x-2">
             <Database className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider font-mono">
-              High-Throughput Batch Inference &amp; CSV Inspector
+            <h2 className="text-sm font-semibold text-white tracking-wide font-mono uppercase">
+              High-Throughput Batch Stream &amp; File Inspector
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-0.5">
-            Process multi-transaction streams with sub-millisecond pipeline SLA (139,000+ tx/sec capability).
+            Process vectorized multi-transaction streams with sub-millisecond pipeline SLA (139k+ tx/sec tree engine).
           </p>
         </div>
 
         <div className="flex items-center space-x-2.5">
-          <label className="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-mono flex items-center space-x-1.5 cursor-pointer border border-slate-700 transition">
-            <Upload className="w-3.5 h-3.5" />
+          <label className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] text-slate-200 text-xs font-mono flex items-center space-x-2 cursor-pointer border border-white/[0.08] transition">
+            <Upload className="w-3.5 h-3.5 text-slate-400" />
             <span>Upload CSV/JSON</span>
             <input type="file" accept=".csv,.json" onChange={handleFileUpload} className="hidden" />
           </label>
@@ -154,7 +154,7 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
           <button
             onClick={handleRunBatchScoring}
             disabled={loading}
-            className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold font-mono flex items-center space-x-1.5 shadow-md shadow-emerald-600/20 transition disabled:opacity-50"
+            className="px-4 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-semibold font-mono flex items-center space-x-2 shadow-lg shadow-emerald-500/20 transition disabled:opacity-50"
           >
             <Play className="w-3.5 h-3.5 fill-current" />
             <span>{loading ? 'Evaluating Batch...' : 'Score Batch Live'}</span>
@@ -165,29 +165,29 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
       {/* Batch Stats KPI Cards */}
       {batchStats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fadeIn">
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
-            <span className="text-xs text-slate-400 font-mono block">Transactions Evaluated</span>
+          <div className="glass-card p-4 rounded-xl">
+            <span className="text-xs text-slate-400 font-mono block">Transactions Scored</span>
             <span className="text-xl font-bold font-mono text-white mt-1 block">
               {batchStats.total} Records
             </span>
           </div>
 
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
+          <div className="glass-card p-4 rounded-xl">
             <span className="text-xs text-slate-400 font-mono block">Frauds Intercepted</span>
-            <span className="text-xl font-bold font-mono text-red-400 mt-1 block">
+            <span className="text-xl font-bold font-mono text-rose-400 mt-1 block">
               {batchStats.frauds} ({((batchStats.frauds / batchStats.total) * 100).toFixed(1)}%)
             </span>
           </div>
 
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
+          <div className="glass-card p-4 rounded-xl">
             <span className="text-xs text-slate-400 font-mono block">Fraud Volume Protected</span>
             <span className="text-xl font-bold font-mono text-emerald-400 mt-1 block">
               ${batchStats.fraudAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}
             </span>
           </div>
 
-          <div className="bg-slate-900/90 border border-slate-800 p-4 rounded-xl">
-            <span className="text-xs text-slate-400 font-mono block">Per-Tx Latency Avg</span>
+          <div className="glass-card p-4 rounded-xl">
+            <span className="text-xs text-slate-400 font-mono block">Average Per-Tx SLA</span>
             <span className="text-xl font-bold font-mono text-cyan-400 mt-1 block">
               {batchStats.avgLatency} ms
             </span>
@@ -196,9 +196,9 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
       )}
 
       {/* Table & Filtering */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
+      <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl">
         {/* Table Header Filter controls */}
-        <div className="p-4 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-slate-950/40">
+        <div className="p-4 border-b border-white/[0.06] flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-white/[0.01]">
           <div className="flex items-center space-x-2">
             <div className="relative">
               <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-500" />
@@ -207,20 +207,20 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
                 value={searchTerm}
                 onChange={e => setSearchTerm(e.target.value)}
                 placeholder="Filter by ID, merchant, amount..."
-                className="bg-slate-900 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-emerald-500 font-mono w-60"
+                className="glass-input rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 font-mono w-64"
               />
             </div>
           </div>
 
-          <div className="flex items-center space-x-1.5">
+          <div className="flex items-center space-x-1.5 p-1 rounded-xl bg-white/[0.03] border border-white/[0.06]">
             {(['ALL', 'FRAUD', 'LEGIT'] as const).map(f => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1 rounded-lg text-xs font-mono font-medium transition ${
                   filter === f
-                    ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                    ? 'bg-white/[0.1] text-white shadow-sm border border-white/[0.12]'
+                    : 'text-slate-400 hover:text-slate-200'
                 }`}
               >
                 {f === 'ALL' ? 'All (10)' : f === 'FRAUD' ? 'Flagged Frauds' : 'Authorized'}
@@ -232,18 +232,18 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
         {/* Table Body */}
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs font-mono">
-            <thead className="bg-slate-950/80 text-slate-400 border-b border-slate-800">
+            <thead className="bg-white/[0.02] text-slate-400 border-b border-white/[0.06]">
               <tr>
-                <th className="py-3 px-4">Transaction ID</th>
-                <th className="py-3 px-4">Merchant / Channel</th>
-                <th className="py-3 px-4">Amount ($)</th>
-                <th className="py-3 px-4">Time (Hour)</th>
-                <th className="py-3 px-4">Fraud Probability</th>
-                <th className="py-3 px-4">Decision</th>
-                <th className="py-3 px-4 text-right">Details</th>
+                <th className="py-3.5 px-4 font-medium">Transaction ID</th>
+                <th className="py-3.5 px-4 font-medium">Merchant / Channel</th>
+                <th className="py-3.5 px-4 font-medium">Amount ($)</th>
+                <th className="py-3.5 px-4 font-medium">Time (Hour)</th>
+                <th className="py-3.5 px-4 font-medium">Fraud Probability</th>
+                <th className="py-3.5 px-4 font-medium">Decision</th>
+                <th className="py-3.5 px-4 font-medium text-right">Details</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60 text-slate-300">
+            <tbody className="divide-y divide-white/[0.04] text-slate-300">
               {filteredRows.map(row => {
                 const pred = row.prediction;
                 const isFraud = pred?.is_fraud;
@@ -251,16 +251,16 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
                 const hour = ((row.tx.Time % 86400) / 3600).toFixed(1);
 
                 return (
-                  <tr key={row.id} className="hover:bg-slate-800/40 transition">
-                    <td className="py-3 px-4 font-bold text-white">{row.id}</td>
-                    <td className="py-3 px-4 text-slate-400">{row.merchant || 'Standard POS'}</td>
-                    <td className="py-3 px-4 font-semibold text-slate-200">
+                  <tr key={row.id} className="hover:bg-white/[0.03] transition-colors">
+                    <td className="py-3 px-4 font-semibold text-white">{row.id}</td>
+                    <td className="py-3 px-4 text-slate-400">{row.merchant || 'POS Terminal'}</td>
+                    <td className="py-3 px-4 font-medium text-slate-200">
                       ${row.tx.Amount.toFixed(2)}
                     </td>
                     <td className="py-3 px-4 text-slate-400">{hour}h</td>
                     <td className="py-3 px-4">
                       {pred ? (
-                        <span className={`font-bold ${isFraud ? 'text-red-400' : 'text-emerald-400'}`}>
+                        <span className={`font-bold ${isFraud ? 'text-rose-400' : 'text-emerald-400'}`}>
                           {prob}
                         </span>
                       ) : (
@@ -272,8 +272,8 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
                         <span
                           className={`inline-flex items-center space-x-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${
                             isFraud
-                              ? 'bg-red-500/10 text-red-400 border-red-500/30'
-                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                              ? 'bg-rose-500/10 text-rose-400 border-rose-500/20'
+                              : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                           }`}
                         >
                           {isFraud ? <ShieldAlert className="w-3 h-3 mr-1" /> : <ShieldCheck className="w-3 h-3 mr-1" />}
@@ -286,7 +286,7 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
                     <td className="py-3 px-4 text-right">
                       <button
                         onClick={() => setSelectedRow(row)}
-                        className="text-xs text-emerald-400 hover:text-emerald-300 underline"
+                        className="text-xs text-emerald-400 hover:text-emerald-300 underline font-medium"
                       >
                         Inspect
                       </button>
@@ -301,31 +301,31 @@ export const BatchInspector: React.FC<BatchInspectorProps> = ({ apiConfig }) => 
 
       {/* Row Inspector Modal */}
       {selectedRow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-[#0f172a] border border-slate-700 rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl animate-fadeIn">
+          <div className="glass-panel border border-white/[0.15] rounded-2xl w-full max-w-2xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+            <div className="flex items-center justify-between pb-3 border-b border-white/[0.08]">
               <div>
-                <h3 className="text-sm font-bold text-white font-mono">{selectedRow.id} — Payload Inspector</h3>
+                <h3 className="text-sm font-bold text-white font-mono">{selectedRow.id} — Latent Space Payload</h3>
                 <span className="text-xs text-slate-400">{selectedRow.merchant}</span>
               </div>
               <button
                 onClick={() => setSelectedRow(null)}
-                className="text-slate-400 hover:text-white px-2 py-1 rounded bg-slate-800"
+                className="p-1 rounded-lg bg-white/[0.05] hover:bg-white/[0.1] text-slate-400 hover:text-white transition"
               >
-                Close
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="my-4 overflow-y-auto flex-1 font-mono text-xs bg-slate-950 p-4 rounded-xl border border-slate-800 text-slate-300">
+            <div className="my-4 overflow-y-auto flex-1 font-mono text-xs bg-black/50 p-4 rounded-xl border border-white/[0.08] text-slate-300">
               <pre>{JSON.stringify({ ...selectedRow.tx, prediction: selectedRow.prediction }, null, 2)}</pre>
             </div>
 
-            <div className="flex justify-end pt-2 border-t border-slate-800">
+            <div className="flex justify-end pt-3 border-t border-white/[0.08]">
               <button
                 onClick={() => setSelectedRow(null)}
-                className="px-4 py-1.5 bg-slate-800 text-slate-200 rounded-lg text-xs font-mono"
+                className="px-4 py-1.5 bg-white/[0.08] hover:bg-white/[0.15] text-white rounded-xl text-xs font-mono transition"
               >
-                Done
+                Close Inspector
               </button>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DollarSign, ShieldAlert, TrendingUp, Calculator, ArrowRight, CheckCircle } from 'lucide-react';
+import { DollarSign, ShieldAlert, TrendingUp, Calculator, ArrowRight, CheckCircle, Sparkles } from 'lucide-react';
 
 export const RoiCalculator: React.FC = () => {
   const [monthlyVolume, setMonthlyVolume] = useState<number>(500000);
@@ -39,10 +39,10 @@ export const RoiCalculator: React.FC = () => {
   return (
     <div className="space-y-6">
       {/* Title */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 shadow-lg">
+      <div className="glass-panel rounded-2xl p-6 shadow-2xl">
         <div className="flex items-center space-x-3 mb-2">
           <Calculator className="w-5 h-5 text-emerald-400" />
-          <h2 className="text-base font-bold text-white font-mono uppercase tracking-wide">
+          <h2 className="text-sm font-bold text-white font-mono uppercase tracking-wider">
             Enterprise Financial Cost-Benefit &amp; ROI Simulator
           </h2>
         </div>
@@ -53,13 +53,13 @@ export const RoiCalculator: React.FC = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Controls Column (5 cols) */}
-        <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-2xl p-6 shadow-lg space-y-5">
-          <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider border-b border-slate-800 pb-3">
+        <div className="lg:col-span-5 glass-panel rounded-2xl p-6 shadow-2xl space-y-5">
+          <h3 className="text-xs font-bold text-white font-mono uppercase tracking-wider border-b border-white/[0.06] pb-3">
             Portfolio Volume &amp; Cost Parameters
           </h3>
 
           {/* Monthly Volume */}
-          <div className="space-y-1.5">
+          <div className="space-y-2 glass-card p-4 rounded-xl">
             <div className="flex justify-between text-xs font-mono">
               <span className="text-slate-300">Monthly Transactions</span>
               <span className="font-bold text-emerald-400">{monthlyVolume.toLocaleString()} tx/mo</span>
@@ -71,15 +71,15 @@ export const RoiCalculator: React.FC = () => {
               step="50000"
               value={monthlyVolume}
               onChange={e => setMonthlyVolume(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-800 rounded appearance-none accent-emerald-500"
+              className="w-full"
             />
           </div>
 
           {/* Fraud Rate */}
-          <div className="space-y-1.5">
+          <div className="space-y-2 glass-card p-4 rounded-xl">
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-slate-300">Fraud Occurrence Rate</span>
-              <span className="font-bold text-red-400">{fraudRatePercent.toFixed(2)}%</span>
+              <span className="text-slate-300">Fraud Rate Baseline</span>
+              <span className="font-bold text-rose-400">{fraudRatePercent.toFixed(2)}%</span>
             </div>
             <input
               type="range"
@@ -88,14 +88,14 @@ export const RoiCalculator: React.FC = () => {
               step="0.01"
               value={fraudRatePercent}
               onChange={e => setFraudRatePercent(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-800 rounded appearance-none accent-red-500"
+              className="w-full"
             />
           </div>
 
           {/* Avg Ticket Size */}
-          <div className="space-y-1.5">
+          <div className="space-y-2 glass-card p-4 rounded-xl">
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-slate-300">Avg Fraudulent Ticket Amount</span>
+              <span className="text-slate-300">Average Ticket Amount</span>
               <span className="font-bold text-cyan-400">${avgTicketSize} USD</span>
             </div>
             <input
@@ -105,14 +105,14 @@ export const RoiCalculator: React.FC = () => {
               step="5"
               value={avgTicketSize}
               onChange={e => setAvgTicketSize(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-800 rounded appearance-none accent-cyan-500"
+              className="w-full"
             />
           </div>
 
           {/* Investigation Overhead */}
-          <div className="space-y-1.5">
+          <div className="space-y-2 glass-card p-4 rounded-xl">
             <div className="flex justify-between text-xs font-mono">
-              <span className="text-slate-300">Manual Review Overhead / False Alarm</span>
+              <span className="text-slate-300">False Alarm Review Cost</span>
               <span className="font-bold text-amber-400">${investigationCost} / case</span>
             </div>
             <input
@@ -122,19 +122,19 @@ export const RoiCalculator: React.FC = () => {
               step="5"
               value={investigationCost}
               onChange={e => setInvestigationCost(parseFloat(e.target.value))}
-              className="w-full h-1.5 bg-slate-800 rounded appearance-none accent-amber-500"
+              className="w-full"
             />
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-950 border border-slate-800 text-xs font-mono space-y-2">
-            <span className="text-slate-400 block">Baseline Financial Exposure:</span>
+          <div className="p-4 rounded-xl glass-card text-xs font-mono space-y-2 border border-white/[0.08]">
+            <span className="text-slate-400 block text-[11px]">Gross Baseline Exposure:</span>
             <div className="flex justify-between text-slate-300">
               <span>Expected Monthly Attacks:</span>
               <span className="font-bold text-white">{expectedFraudCount} cases</span>
             </div>
             <div className="flex justify-between text-slate-300">
               <span>Gross Fraud Risk Volume:</span>
-              <span className="font-bold text-red-400">
+              <span className="font-bold text-rose-400">
                 ${expectedTotalFraudLoss.toLocaleString('en-US', { minimumFractionDigits: 0 })}/mo
               </span>
             </div>
@@ -144,7 +144,8 @@ export const RoiCalculator: React.FC = () => {
         {/* Results Column (7 cols) */}
         <div className="lg:col-span-7 space-y-4">
           {/* Main Hero Net Savings Card */}
-          <div className="bg-gradient-to-br from-emerald-950/40 via-slate-900 to-slate-900 border border-emerald-500/40 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+          <div className="glass-panel border border-emerald-500/30 rounded-2xl p-7 shadow-2xl relative overflow-hidden group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-emerald-500/20 transition-all duration-700" />
             <div className="relative z-10">
               <span className="text-xs font-mono font-semibold text-emerald-400 uppercase tracking-wider block">
                 Net Annual Value Created by AegisRisk
@@ -153,7 +154,7 @@ export const RoiCalculator: React.FC = () => {
                 +${annualSavingsGain.toLocaleString('en-US', { maximumFractionDigits: 0 })}
                 <span className="text-sm font-normal text-slate-400 ml-2">/ year</span>
               </span>
-              <p className="text-xs text-slate-300 mt-2">
+              <p className="text-xs text-slate-300 mt-2.5 leading-relaxed">
                 Outperforms generic uncalibrated heuristics by eliminating 96.8% of false positive investigation labor.
               </p>
             </div>
@@ -162,10 +163,12 @@ export const RoiCalculator: React.FC = () => {
           {/* Comparison Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* AegisRisk */}
-            <div className="bg-slate-900/90 border border-emerald-500/30 rounded-2xl p-5 space-y-3 font-mono text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="glass-card border-emerald-500/30 rounded-2xl p-5 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
                 <span className="font-bold text-emerald-400">AegisRisk AI Ensemble</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400">96.77% Precision</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  96.77% Precision
+                </span>
               </div>
               <div className="space-y-2 text-slate-300">
                 <div className="flex justify-between">
@@ -180,7 +183,7 @@ export const RoiCalculator: React.FC = () => {
                   <span>Investigation Labor Cost:</span>
                   <span className="text-amber-400">-${aegisInvestigationOverhead.toLocaleString()}</span>
                 </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between font-bold text-white text-sm">
+                <div className="pt-2 border-t border-white/[0.06] flex justify-between font-bold text-white text-sm">
                   <span>Net Monthly Benefit:</span>
                   <span className="text-emerald-400">${aegisNetSavings.toLocaleString()}</span>
                 </div>
@@ -188,10 +191,12 @@ export const RoiCalculator: React.FC = () => {
             </div>
 
             {/* Standard Generic Baseline */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-2xl p-5 space-y-3 font-mono text-xs">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div className="glass-card rounded-2xl p-5 space-y-3 font-mono text-xs">
+              <div className="flex items-center justify-between border-b border-white/[0.06] pb-2">
                 <span className="font-bold text-slate-400">Standard Generic Rule/Tree</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400">65.0% Precision</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-400 border border-white/[0.08]">
+                  65.0% Precision
+                </span>
               </div>
               <div className="space-y-2 text-slate-400">
                 <div className="flex justify-between">
@@ -200,13 +205,13 @@ export const RoiCalculator: React.FC = () => {
                 </div>
                 <div className="flex justify-between">
                   <span>False Alarm Reviews:</span>
-                  <span className="text-red-400 font-bold">{baseFalsePositives} cases (High)</span>
+                  <span className="text-rose-400 font-bold">{baseFalsePositives} cases</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Investigation Labor Cost:</span>
-                  <span className="text-red-400">-${baseInvestigationOverhead.toLocaleString()}</span>
+                  <span className="text-rose-400">-${baseInvestigationOverhead.toLocaleString()}</span>
                 </div>
-                <div className="pt-2 border-t border-slate-800 flex justify-between font-bold text-white text-sm">
+                <div className="pt-2 border-t border-white/[0.06] flex justify-between font-bold text-white text-sm">
                   <span>Net Monthly Benefit:</span>
                   <span className="text-slate-300">${baseNetSavings.toLocaleString()}</span>
                 </div>

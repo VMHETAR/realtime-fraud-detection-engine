@@ -14,48 +14,56 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
   threshold = 0.5878
 }) => {
   const percent = Math.min(100, Math.max(0, probability * 100));
-  const radius = 70;
-  const strokeWidth = 12;
+  const radius = 72;
+  const strokeWidth = 10;
   const circumference = 2 * Math.PI * radius;
   // Semicircle gauge: 220 degree arc
   const arcLength = circumference * 0.75;
   const strokeDashoffset = arcLength - (arcLength * percent) / 100;
 
-  // Determine colors
+  // Determine colors & glowing styles
   let colorHex = '#10b981'; // green
   let glowClass = 'glow-emerald';
-  let badgeText = 'LOW RISK';
-  let badgeBg = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+  let badgeText = 'LEGITIMATE';
+  let badgeBg = 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
 
   if (probability >= 0.80) {
-    colorHex = '#ef4444'; // red
+    colorHex = '#f43f5e'; // rose red
     glowClass = 'glow-rose';
     badgeText = 'CRITICAL FRAUD';
-    badgeBg = 'bg-red-500/10 text-red-400 border-red-500/30';
+    badgeBg = 'bg-rose-500/10 text-rose-400 border-rose-500/20';
   } else if (probability >= 0.35) {
     colorHex = '#f59e0b'; // amber
     glowClass = 'glow-amber';
-    badgeText = 'MEDIUM SUSPICION';
-    badgeBg = 'bg-amber-500/10 text-amber-400 border-amber-500/30';
+    badgeText = 'SUSPICIOUS / REVIEW';
+    badgeBg = 'bg-amber-500/10 text-amber-400 border-amber-500/20';
   }
 
   return (
-    <div className="flex flex-col items-center justify-center p-6 bg-slate-900/90 rounded-2xl border border-slate-800 relative overflow-hidden">
-      {/* Ambient background light */}
+    <div className="flex flex-col items-center justify-center p-6 rounded-2xl glass-card relative overflow-hidden group">
+      {/* Ambient background light blur */}
       <div
-        className="absolute w-40 h-40 rounded-full blur-3xl opacity-20 pointer-events-none transition-colors duration-700"
+        className="absolute w-44 h-44 rounded-full blur-[70px] opacity-25 pointer-events-none transition-colors duration-700 -top-10"
         style={{ backgroundColor: colorHex }}
       />
 
       <div className="relative w-48 h-48 flex items-center justify-center">
         <svg className="w-full h-full transform -rotate-135" viewBox="0 0 180 180">
+          <defs>
+            <linearGradient id="gaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#10b981" />
+              <stop offset="50%" stopColor="#f59e0b" />
+              <stop offset="100%" stopColor="#f43f5e" />
+            </linearGradient>
+          </defs>
+
           {/* Background track */}
           <circle
             cx="90"
             cy="90"
             r={radius}
             fill="none"
-            stroke="#1e293b"
+            stroke="rgba(255, 255, 255, 0.06)"
             strokeWidth={strokeWidth}
             strokeDasharray={`${arcLength} ${circumference}`}
             strokeLinecap="round"
@@ -78,30 +86,25 @@ export const RiskGauge: React.FC<RiskGaugeProps> = ({
 
         {/* Center content */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center mt-2">
-          <span className="text-4xl font-extrabold font-mono tracking-tight text-white">
-            {percent.toFixed(2)}%
+          <span className="text-[10px] uppercase font-mono tracking-widest text-slate-400">
+            Posterior Risk
           </span>
-          <span className="text-[11px] uppercase tracking-wider text-slate-400 font-mono mt-0.5">
-            Fraud Probability
+          <span className="text-3xl font-bold font-mono tracking-tight text-white my-0.5">
+            {percent.toFixed(1)}%
+          </span>
+          <span className={`px-2 py-0.5 text-[10px] font-semibold border rounded-full font-mono mt-1 ${badgeBg}`}>
+            {badgeText}
           </span>
         </div>
       </div>
 
-      {/* Decision Pill */}
-      <div className="mt-3 flex flex-col items-center space-y-2">
-        <div className={`px-3.5 py-1 rounded-full text-xs font-mono font-semibold border ${badgeBg} flex items-center space-x-1.5`}>
-          <span className="w-2 h-2 rounded-full animate-ping" style={{ backgroundColor: colorHex }} />
-          <span>{badgeText}</span>
-        </div>
-
-        <div className="text-xs text-slate-400 font-mono flex items-center space-x-2">
-          <span>Decision:</span>
-          <span className={`font-bold ${isFraud ? 'text-red-400' : 'text-emerald-400'}`}>
-            {isFraud ? 'BLOCKED / INTERCEPTED' : 'AUTHORIZED'}
-          </span>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-400 text-[11px]">Threshold: {(threshold * 100).toFixed(1)}%</span>
-        </div>
+      {/* Decision threshold indicator */}
+      <div className="mt-4 pt-3 border-t border-white/[0.06] w-full flex items-center justify-between text-xs text-slate-400 font-mono">
+        <span className="text-slate-400">Threshold:</span>
+        <span className="text-slate-200 font-semibold">{(threshold * 100).toFixed(1)}%</span>
+        <span className="text-slate-500">•</span>
+        <span className="text-slate-400">Calibrated:</span>
+        <span className="text-emerald-400 font-semibold">Platt Sigmoid</span>
       </div>
     </div>
   );
