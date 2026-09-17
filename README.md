@@ -18,7 +18,7 @@ Financial transaction fraud detection presents one of the most demanding challen
 2. **Asymmetric Business Costs:** False Negatives (missed frauds) result in direct balance loss; False Positives cause customer friction and manual compliance investigation overhead ($\$50$/case).
 3. **Hard Real-Time Latency SLAs:** Inference pipelines must score authorization requests in **$< 10\text{ ms}$** per transaction at scale.
 
-This repository provides an **end-to-end, production-grade fraud risk detection system** combining **Deep Tabular Neural ResNets**, **Focal Loss**, **Gradient Boosted Decision Trees (LightGBM / XGBoost)**, **Platt-Calibrated Soft-Voting Stacking**, and an asynchronous **FastAPI** microservice.
+This repository provides an **end-to-end, production-grade fraud risk detection system** combining **Deep Tabular Neural ResNets**, **Focal Loss**, **Gradient Boosted Decision Trees (LightGBM / XGBoost)**, **Platt-Calibrated Soft-Voting Stacking**, and an asynchronous **FastAPI** microservice on `localhost` with **smart dynamic port collision resolution**.
 
 ---
 
@@ -62,7 +62,8 @@ This repository provides an **end-to-end, production-grade fraud risk detection 
                                                 │
                                                 ▼
                          ┌──────────────────────────────────────────────┐
-                         │        FastAPI Real-Time Microservice        │
+                         │    FastAPI Real-Time Microservice (Local)    │
+                         │  • Auto Port Detection (8000 -> 8001 -> ...) │
                          │  • GET  /health (Readiness / State)          │
                          │  • POST /v1/predict (Sub-ms Single Score)    │
                          │  • POST /v1/batch-predict (19k+ tx/sec)      │
@@ -139,8 +140,9 @@ realtime-fraud-detection-engine/
 ├── requirements.txt                    # Exact pinned dependencies
 ├── conftest.py                         # Pytest environment configuration
 ├── run_pipeline.py                     # Master execution orchestrator
+├── serve.py                            # Localhost FastAPI server launcher with dynamic port fallback
 ├── config/
-│   └── config.yaml                     # Pipeline hyperparameters & threshold settings
+│   └── config.yaml                     # Pipeline hyperparameters & server settings
 ├── data/
 │   ├── raw/                            # Automated data ingestion directory
 │   └── processed/                      # Preprocessed arrays
@@ -162,14 +164,15 @@ realtime-fraud-detection-engine/
 │   └── api/
 │       ├── __init__.py
 │       ├── schemas.py                  # Pydantic v2 validation models
-│       └── app.py                      # Production FastAPI inference microservice
+│       ├── app.py                      # Production FastAPI inference microservice
+│       └── server.py                   # Port collision resolver & server daemon
 ├── artifacts/
 │   ├── models/                         # Serialized model weights (.pkl, .pt)
 │   ├── figures/                        # High-resolution benchmark figures (.png)
 │   └── metrics_summary.json            # Machine-readable performance metrics
 └── tests/
     ├── __init__.py
-    └── test_pipeline.py                # Unit & integration test suite
+    └── test_pipeline.py                # Unit & integration test suite (6/6 passing)
 ```
 
 ---
@@ -194,11 +197,19 @@ python run_pipeline.py
 pytest tests/ -v
 ```
 
-### 4. Launch the FastAPI Serving Microservice
+### 4. Launch the FastAPI Serving Microservice on Localhost
+The server runs on `127.0.0.1` (localhost) with **automatic port collision scanning**. If port 8000 is occupied by another service, it automatically binds to the next free port (`8001`, `8002`, etc.):
 ```bash
-uvicorn src.api.app:app --host 0.0.0.0 --port 8000 --reload
+# Default: runs on localhost (127.0.0.1) with auto-port fallback
+python serve.py
+
+# Custom starting port:
+python serve.py --port 8080
+
+# Development mode with auto-reload:
+python serve.py --reload
 ```
-Interactive Swagger UI is accessible at: `http://localhost:8000/docs`
+Interactive Swagger UI is accessible at: `http://127.0.0.1:<PORT>/docs` (e.g. `http://127.0.0.1:8000/docs`)
 
 ---
 
@@ -206,7 +217,7 @@ Interactive Swagger UI is accessible at: `http://localhost:8000/docs`
 
 ### Single Transaction Real-Time Scoring (`POST /v1/predict`)
 ```bash
-curl -X POST "http://localhost:8000/v1/predict" \
+curl -X POST "http://127.0.0.1:8000/v1/predict" \
      -H "Content-Type: application/json" \
      -d '{
        "Time": 406.0,

@@ -1,9 +1,10 @@
 """
-Unit and integration tests for Data Loader, Feature Pipeline, Model Inference, and API.
+Unit and integration tests for Data Loader, Feature Pipeline, Model Inference, API, and Server.
 """
 
 import os
 import pytest
+import socket
 import numpy as np
 import pandas as pd
 from fastapi.testclient import TestClient
@@ -14,6 +15,7 @@ from src.models.tree_models import TreeModelManager
 from src.models.deep_tabular import TabularResNet, BinaryFocalLoss
 from src.models.ensemble import CalibratedEnsemble
 from src.api.app import app
+from src.api.server import is_port_available, find_available_port
 
 
 @pytest.fixture
@@ -106,3 +108,24 @@ def test_fastapi_endpoints():
     assert "fraud_probability" in data
     assert "is_fraud" in data
     assert "risk_level" in data
+
+
+def test_port_finder_logic():
+    # 1. Test is_port_available on a valid port
+    port, was_busy = find_available_port(preferred_port=8990, host="127.0.0.1")
+    assert isinstance(port, int)
+    assert port >= 8990
+
+    # 2. Test fallback when a port is artificially occupied
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("127.0.0.1", 9123))
+    sock.listen(1)
+    
+    try:
+        # Now 9123 is busy, port finder should resolve to 9124 or higher
+        new_port, busy_flag = find_available_port(preferred_port=9123, host="127.0.0.1")
+        assert busy_flag is True
+        assert new_port != 9123
+        assert new_port > 9123
+    finally:
+        sock.close()

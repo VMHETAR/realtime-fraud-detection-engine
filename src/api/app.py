@@ -211,3 +211,8 @@ async def get_system_metrics():
     Returns benchmark evaluation metrics and latency performance.
     """
     return metrics_cache if metrics_cache else {"message": "Metrics pending pipeline execution"}
+
+
+if __name__ == "__main__":
+    from src.api.server import run_server
+    run_server(host="127.0.0.1", port=8000, reload=False, auto_port=True)
