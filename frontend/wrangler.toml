@@ -1,0 +1,7 @@
+name = "aegis-fraud-detector"
+compatibility_date = "2024-09-01"
+pages_build_output_dir = "dist"
+
+[env.production.vars]
+ENVIRONMENT = "production"
+API_DEFAULT_MODE = "simulation_and_direct"

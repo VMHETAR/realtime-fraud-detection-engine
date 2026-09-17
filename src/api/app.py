@@ -10,6 +10,8 @@ import numpy as np
 import pandas as pd
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from typing import Dict, Any
 
 from src.feature_engineering import FraudFeaturePipeline
@@ -31,6 +33,7 @@ metrics_cache: Dict[str, Any] = {}
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 ARTIFACTS_DIR = os.path.join(BASE_DIR, "artifacts")
+FRONTEND_DIST_DIR = os.path.join(BASE_DIR, "frontend", "dist")
 
 
 def load_artifacts():
@@ -73,6 +76,15 @@ app = FastAPI(
     description="Production-grade AI inference microservice for sub-millisecond fraud risk evaluation.",
     version="1.0.0",
     lifespan=lifespan
+)
+
+# Enable CORS for local development and Cloudflare Pages deployment
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
@@ -211,6 +223,11 @@ async def get_system_metrics():
     Returns benchmark evaluation metrics and latency performance.
     """
     return metrics_cache if metrics_cache else {"message": "Metrics pending pipeline execution"}
+
+
+# Mount static frontend build if available (supports single-command full-stack serving)
+if os.path.exists(FRONTEND_DIST_DIR):
+    app.mount("/", StaticFiles(directory=FRONTEND_DIST_DIR, html=True), name="frontend")
 
 
 if __name__ == "__main__":

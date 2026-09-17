@@ -1,13 +1,14 @@
 # 🛡️ Real-Time Financial Fraud & Risk Detection Engine
-### *Ultra-Imbalanced Anomaly Detection, Deep Tabular ResNets, Calibrated Ensemble & Sub-Millisecond FastAPI Serving*
+### *Ultra-Imbalanced Anomaly Detection, Deep Tabular ResNets, Calibrated Ensemble & Cloudflare-Ready UI*
 
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
+[![React](https://img.shields.io/badge/React-18.x-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
+[![Cloudflare](https://img.shields.io/badge/Cloudflare_Pages-Ready-F38020?style=for-the-badge&logo=cloudflare&logoColor=white)](https://pages.cloudflare.com/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.x-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white)](https://pytorch.org/)
 [![LightGBM](https://img.shields.io/badge/LightGBM-4.x-brightgreen?style=for-the-badge)](https://lightgbm.readthedocs.io/)
 [![XGBoost](https://img.shields.io/badge/XGBoost-3.x-red?style=for-the-badge)](https://xgboost.readthedocs.io/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.128%2B-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
-[![Tests](https://img.shields.io/badge/Tests-Passing-success?style=for-the-badge&logo=pytest&logoColor=white)](https://pytest.org/)
 
 ---
 
@@ -18,7 +19,19 @@ Financial transaction fraud detection presents one of the most demanding challen
 2. **Asymmetric Business Costs:** False Negatives (missed frauds) result in direct balance loss; False Positives cause customer friction and manual compliance investigation overhead ($\$50$/case).
 3. **Hard Real-Time Latency SLAs:** Inference pipelines must score authorization requests in **$< 10\text{ ms}$** per transaction at scale.
 
-This repository provides an **end-to-end, production-grade fraud risk detection system** combining **Deep Tabular Neural ResNets**, **Focal Loss**, **Gradient Boosted Decision Trees (LightGBM / XGBoost)**, **Platt-Calibrated Soft-Voting Stacking**, and an asynchronous **FastAPI** microservice on `localhost` with **smart dynamic port collision resolution**.
+This repository provides an **end-to-end, production-grade fraud risk detection system** combining **Deep Tabular Neural ResNets**, **Focal Loss**, **Gradient Boosted Decision Trees (LightGBM / XGBoost)**, **Platt-Calibrated Soft-Voting Stacking**, an asynchronous **FastAPI** microservice on `localhost`, and a **cyber-styled Cloudflare Pages interactive frontend**.
+
+---
+
+## 🖥️ Interactive Web Frontend (Cloudflare Pages Ready)
+
+The application includes a self-contained, responsive SPA in `frontend/` featuring:
+- ⚡ **Live Risk Assessment Simulator:** Real-time sliders for Transaction Amount, Time of Day, and 28 PCA Latent Components with instant visual gauge & driver decomposition.
+- 🎯 **Preset Attack Archetypes:** Pre-configured scenarios (*Everyday Coffee POS*, *Midnight Account Drain*, *Micro-Probing Bot Attack*, *Borderline Electronics Checkout*).
+- 📁 **Batch CSV/JSON Inspector:** Upload multi-record transaction streams, evaluate in real-time, filter by risk band, and inspect full JSON telemetry.
+- 📊 **Scientific Model Benchmark Gallery:** Interactive ROC curves, Precision-Recall diagrams, Platt calibration curves, and feature importance rankings.
+- 💰 **Enterprise ROI / Cost Utility Simulator:** Dynamic slider model computing annual dollar savings after factoring in false alarm investigation labor.
+- 🌐 **Cloudflare Edge Fallback Engine:** If the backend is not connected, a built-in client-side Edge model simulator evaluates transactions with mathematical fidelity—guaranteeing 100% uptime for public portfolio demos.
 
 ---
 
@@ -60,39 +73,15 @@ This repository provides an **end-to-end, production-grade fraud risk detection 
                          │    [LOW | MEDIUM | CRITICAL]                 │
                          └──────────────────────┬───────────────────────┘
                                                 │
-                                                ▼
-                         ┌──────────────────────────────────────────────┐
-                         │    FastAPI Real-Time Microservice (Local)    │
-                         │  • Auto Port Detection (8000 -> 8001 -> ...) │
-                         │  • GET  /health (Readiness / State)          │
-                         │  • POST /v1/predict (Sub-ms Single Score)    │
-                         │  • POST /v1/batch-predict (19k+ tx/sec)      │
-                         │  • GET  /v1/metrics (Evaluation Cache)       │
-                         └──────────────────────────────────────────────┘
+                 ┌──────────────────────────────┴──────────────────────────────┐
+                 ▼                                                             ▼
+  ┌──────────────────────────────┐                              ┌──────────────────────────────┐
+  │ FastAPI Local Microservice   │                              │   Cloudflare Pages Web UI    │
+  │ • Auto Port Scanning         │                              │ • Interactive Live Simulator │
+  │ • Sub-ms Single/Batch API    │                              │ • Batch CSV Inspector        │
+  │ • Mounted SPA Serving        │                              │ • Autonomous Edge Simulation │
+  └──────────────────────────────┘                              └──────────────────────────────┘
 ```
-
----
-
-## 🔬 Mathematical Formulation
-
-### 1. Focal Loss for Extreme Class Skew
-Standard Cross-Entropy fails under $99.82\%$ negative skew because the vast volume of easily classified negative transactions dominates the gradient. We implement a custom PyTorch **Binary Focal Loss**:
-
-$$\mathcal{L}_{\text{Focal}}(p_t) = -\alpha_t (1 - p_t)^\gamma \log(p_t)$$
-
-where:
-$$p_t = \begin{cases} p & \text{if } y = 1 \\ 1 - p & \text{if } y = 0 \end{cases}, \quad \alpha_t = \begin{cases} \alpha & \text{if } y = 1 \\ 1 - \alpha & \text{if } y = 0 \end{cases}$$
-
-Setting $\gamma = 2.0$ dynamically suppresses the loss contribution from well-classified instances ($p_t > 0.5$) and focuses gradient updates on ambiguous, high-risk fraudulent transactions.
-
-### 2. Platt Scaling Probability Calibration
-Tree ensembles and neural networks trained on rescaled loss surfaces produce uncalibrated raw scores. We fit a logistic calibration mapping over out-of-fold validation log-odds:
-
-$$P(y = 1 \mid z) = \frac{1}{1 + \exp(A \cdot z + B)}$$
-
-minimizing the **Expected Calibration Error (ECE)**:
-
-$$\text{ECE} = \sum_{m=1}^{M} \frac{|B_m|}{N} \left| \text{acc}(B_m) - \text{conf}(B_m) \right|$$
 
 ---
 
@@ -108,71 +97,40 @@ Evaluated strictly on the held-out stratified test partition ($N = 42,722$, $N_{
 | **LightGBM Classifier** | `0.8363` | `0.9562` | `0.8777` | `93.85%` | `82.43%` | `99.99%` | `0.0002` | `0.877 ms` | $\$4,035` |
 | 🏆 **Calibrated Meta-Ensemble** | **`0.8384`** | **`0.9691`** | **`0.8824`** | **`96.77%`** | **`81.08%`** | **`100.00%`** | **`0.0001`** | `3.732 ms` | **`$4,134`** |
 
-> **Key Takeaways:**
-> - The **Calibrated Ensemble** achieves **$96.77\%$ Precision** with only **2 False Positives** out of **42,648 legitimate transactions** while intercepting **$81.08\%$** of frauds.
-> - **XGBoost** provides ultra-low **$0.375\text{ ms}$** P50 inference latency and **139,185 transactions/second** throughput.
-
----
-
-## 📈 Visual Evaluation Gallery
-
-All figures are automatically generated and saved in [`artifacts/figures/`](artifacts/figures/):
-
-| Receiver Operating Characteristic (ROC) | Precision-Recall Benchmark (PR-AUC) |
-| :---: | :---: |
-| ![ROC Curves](artifacts/figures/roc_curves_comparison.png) | ![PR Curves](artifacts/figures/pr_curves_comparison.png) |
-
-| Reliability Diagram (Probability Calibration) | Confusion Matrix (Ensemble) |
-| :---: | :---: |
-| ![Calibration Curves](artifacts/figures/calibration_curves.png) | ![Confusion Matrix](artifacts/figures/confusion_matrix_ensemble.png) |
-
-| Top Predictive Feature Importance | Financial Cost-Benefit Curve |
-| :---: | :---: |
-| ![Feature Importance](artifacts/figures/feature_importance_ranking.png) | ![Cost Optimization](artifacts/figures/financial_cost_optimization.png) |
-
 ---
 
 ## 📁 Repository Structure
 
 ```
 realtime-fraud-detection-engine/
-├── README.md                           # Comprehensive documentation & benchmarks
-├── requirements.txt                    # Exact pinned dependencies
-├── conftest.py                         # Pytest environment configuration
-├── run_pipeline.py                     # Master execution orchestrator
-├── serve.py                            # Localhost FastAPI server launcher with dynamic port fallback
+├── README.md                           # Documentation & benchmarks
+├── requirements.txt                    # Pinned Python dependencies
+├── serve.py                            # Full-stack launcher (FastAPI + React UI)
+├── run_pipeline.py                     # Master training & evaluation pipeline
 ├── config/
-│   └── config.yaml                     # Pipeline hyperparameters & server settings
-├── data/
-│   ├── raw/                            # Automated data ingestion directory
-│   └── processed/                      # Preprocessed arrays
+│   └── config.yaml                     # Model & server configurations
+├── frontend/                           # Cloudflare Pages React / Vite App
+│   ├── index.html
+│   ├── package.json
+│   ├── vite.config.ts
+│   ├── wrangler.toml                   # Cloudflare configuration
+│   ├── public/
+│   │   ├── _headers                    # Cloudflare security & cache headers
+│   │   ├── _redirects                  # Cloudflare SPA redirect
+│   │   └── figures/                    # High-resolution benchmark figures
+│   ├── src/
+│   │   ├── App.tsx                     # Main dashboard orchestrator
+│   │   ├── components/                 # UI Views (Simulator, Batch, Benchmarks, ROI, API)
+│   │   └── utils/                      # Edge Scorer, API client, Presets
+│   └── dist/                           # Pre-built production web bundle
 ├── src/
-│   ├── __init__.py
-│   ├── data_loader.py                  # Stratified train/val/test data loader
-│   ├── feature_engineering.py          # Leak-free feature transformers & scalers
-│   ├── models/
-│   │   ├── __init__.py
-│   │   ├── baseline_model.py           # ElasticNet Logistic & Random Forest
-│   │   ├── tree_models.py              # LightGBM & XGBoost with class weighting
-│   │   ├── deep_tabular.py             # PyTorch Tabular ResNet & Focal Loss
-│   │   └── ensemble.py                 # Platt-calibrated soft-voting meta learner
-│   ├── evaluation/
-│   │   ├── __init__.py
-│   │   ├── metrics.py                  # PR-AUC, ECE, Brier Score, Cost Analysis
-│   │   ├── visualizer.py               # Scientific publication plotting engine
-│   │   └── latency_benchmark.py        # Latency percentiles (P50/P95/P99) profiler
-│   └── api/
-│       ├── __init__.py
-│       ├── schemas.py                  # Pydantic v2 validation models
-│       ├── app.py                      # Production FastAPI inference microservice
-│       └── server.py                   # Port collision resolver & server daemon
-├── artifacts/
-│   ├── models/                         # Serialized model weights (.pkl, .pt)
-│   ├── figures/                        # High-resolution benchmark figures (.png)
-│   └── metrics_summary.json            # Machine-readable performance metrics
+│   ├── data_loader.py                  # Stratified data partitioning
+│   ├── feature_engineering.py          # Leak-free scalers & feature crosses
+│   ├── models/                         # Logistic, LightGBM, XGBoost, PyTorch ResNet, Ensemble
+│   ├── evaluation/                     # PR-AUC, ECE, latency profiler, visualizer
+│   └── api/                            # FastAPI microservice with dynamic localhost binding
 └── tests/
-    ├── __init__.py
-    └── test_pipeline.py                # Unit & integration test suite (6/6 passing)
+    └── test_pipeline.py                # Pytest test suite (6/6 passing)
 ```
 
 ---
@@ -186,30 +144,40 @@ cd realtime-fraud-detection-engine
 pip install -r requirements.txt
 ```
 
-### 2. Execute the Full End-to-End Pipeline
-Downloads data, trains all models, computes calibrations, generates plots, and exports artifacts:
+### 2. Run the Master Machine Learning Pipeline
+Downloads benchmark dataset, trains PyTorch ResNet & Tree Boosters, performs Platt calibration, and exports visual figures:
 ```bash
 python run_pipeline.py
 ```
 
-### 3. Run the Pytest Test Suite
+### 3. Launch Full-Stack Server on Localhost
+Starts FastAPI with dynamic port collision resolution and serves both the API and the interactive React Frontend simultaneously:
 ```bash
-pytest tests/ -v
-```
-
-### 4. Launch the FastAPI Serving Microservice on Localhost
-The server runs on `127.0.0.1` (localhost) with **automatic port collision scanning**. If port 8000 is occupied by another service, it automatically binds to the next free port (`8001`, `8002`, etc.):
-```bash
-# Default: runs on localhost (127.0.0.1) with auto-port fallback
 python serve.py
-
-# Custom starting port:
-python serve.py --port 8080
-
-# Development mode with auto-reload:
-python serve.py --reload
 ```
-Interactive Swagger UI is accessible at: `http://127.0.0.1:<PORT>/docs` (e.g. `http://127.0.0.1:8000/docs`)
+Open **`http://127.0.0.1:8000`** in your browser to interact with the full UI.
+
+---
+
+## ☁️ Deploying to Cloudflare Pages
+
+### Method 1: Using Cloudflare Wrangler CLI
+```bash
+cd frontend
+npm install
+npm run build
+npx wrangler pages deploy dist --project-name aegis-fraud-detector
+```
+
+### Method 2: Via Cloudflare Dashboard (GitHub Connected)
+1. Go to **Cloudflare Dashboard > Pages > Create a Project > Connect to Git**.
+2. Select your repository `VMHETAR/realtime-fraud-detection-engine`.
+3. Set build settings:
+   - **Framework preset:** `Vite`
+   - **Root directory:** `frontend`
+   - **Build command:** `npm run build`
+   - **Build output directory:** `dist`
+4. Click **Save and Deploy**. Your site will be live instantly on a `*.pages.dev` domain with sub-second global edge CDN speed.
 
 ---
 
@@ -220,15 +188,15 @@ Interactive Swagger UI is accessible at: `http://127.0.0.1:<PORT>/docs` (e.g. `h
 curl -X POST "http://127.0.0.1:8000/v1/predict" \
      -H "Content-Type: application/json" \
      -d '{
-       "Time": 406.0,
+       "Time": 41400.0,
        "Amount": 149.62,
-       "V1": -1.3598, "V2": -0.0727, "V3": 2.5363, "V4": 1.3781,
-       "V5": -0.3383, "V6": 0.4623,  "V7": 0.2395, "V8": 0.0986,
-       "V9": 0.3637,  "V10": 0.0907, "V11": -0.5516, "V12": -0.6178,
-       "V13": -0.9913,"V14": -0.3111,"V15": 1.4681, "V16": -0.4704,
-       "V17": 0.2079, "V18": 0.0257, "V19": 0.4039, "V20": 0.2514,
-       "V21": -0.0183,"V22": 0.2778, "V23": -0.1104,"V24": 0.0669,
-       "V25": 0.1285, "V26": -0.1891,"V27": 0.1335, "V28": -0.0210
+       "V1": -0.254, "V2": 0.128, "V3": 1.154, "V4": -0.412,
+       "V5": 0.285,  "V6": -0.089, "V7": 0.312, "V8": 0.045,
+       "V9": -0.198, "V10": 0.085, "V11": -0.450,"V12": 0.280,
+       "V13": -0.320,"V14": 0.150, "V15": 0.810, "V16": -0.090,
+       "V17": 0.015, "V18": 0.085, "V19": -0.140,"V20": 0.035,
+       "V21": -0.020,"V22": 0.080, "V23": -0.040,"V24": 0.015,
+       "V25": 0.110, "V26": -0.120,"V27": 0.018, "V28": -0.005
      }'
 ```
 
